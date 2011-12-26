@@ -6,6 +6,7 @@ Reader::Reader(istream& inpStr){
         this->lines += cell + "\n";
     }
     this->myBaseIter = this->lines.begin();
+    this->myLocalIter = this->myBaseIter;
 }
 
 bool Reader::AtEnd(unsigned int inpPatternSize){
@@ -26,21 +27,63 @@ void Reader::NextBaseChar(){
 
 string Reader::GetNextChar(){
 	string st;
-	st.push_back(*(this->myLocalIter++));
+	if (this->myLocalIter != this->lines.end()){
+		st.push_back(*(this->myLocalIter++));
+	}else{
+		st.push_back(*this->myLocalIter);
+	}
 	return st;
 }
 
-string Reader::GetContext(unsigned int inpNum){
-	string::iterator fwdIter = this->myBaseIter;
+string Reader::Reverse(const string& inpStr)
+{
+	int len = inpStr.size();
+	string reverse = inpStr;
+	for (int n = 0; n < len; ++n)
+	{
+		reverse[len - n - 1] = inpStr[n];
+	}
+	return reverse;
+}
+
+string Reader::PrintContext(unsigned int inpNum){
+	string::iterator fwdIter = this->myLocalIter;
 	string::iterator bwdIter = this->myBaseIter;
 	string subStr;
-	subStr.resize(inpNum);
-	bwdIter--;
-	for (unsigned int i = inpNum - 1; i >= 0; --i){
-		subStr[i] = *(bwdIter--);
+	bool onBegin = true;
+	if (bwdIter != this->lines.begin()){
+		bwdIter--;
+		onBegin = false;
 	}
+	for (int i = inpNum - 1; i >= 0; --i){
+		if (bwdIter != this->lines.begin()){
+			subStr.push_back(*(bwdIter--));
+		} else if (!onBegin){
+			subStr.push_back(*bwdIter);
+			break;
+		} else{
+			break;
+		}
+	}
+	subStr = this->Reverse(subStr);
+	cout<<subStr;
+	subStr.clear();
+
+	string matched;
+	matched += "\e[0;31m";
+	for (string::iterator it = this->myBaseIter; it != myLocalIter; it++){
+		matched += *it;
+	}
+	cout<<matched;
+	subStr += "\e[0m";
 	for (unsigned int i = 0; i < inpNum; ++i){
-		subStr += *(fwdIter++);
+		if (fwdIter != this->lines.end()){
+			subStr.push_back(*(fwdIter++));
+		} else{
+			//subStr.push_back(*fwdIter);
+			break;
+		}
 	}
+	cout<<subStr<<endl;
 	return subStr;
 }
