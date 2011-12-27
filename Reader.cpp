@@ -55,7 +55,7 @@ string Reader::PrintContext(unsigned int inpNum){
 		bwdIter--;
 		onBegin = false;
 	}
-	for (int i = inpNum - 1; i >= 0; --i){
+	while (*bwdIter != '\n'){
 		if (bwdIter != this->lines.begin()){
 			subStr.push_back(*(bwdIter--));
 		} else if (!onBegin){
@@ -76,7 +76,7 @@ string Reader::PrintContext(unsigned int inpNum){
 	}
 	cout<<matched;
 	subStr += "\e[0m";
-	for (unsigned int i = 0; i < inpNum; ++i){
+	while (*fwdIter != '\n'){
 		if (fwdIter != this->lines.end()){
 			subStr.push_back(*(fwdIter++));
 		} else{
